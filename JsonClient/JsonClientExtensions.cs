@@ -30,18 +30,6 @@ namespace Redpill.JsonClient {
             return await response.DeserializeAsync<TResult> (jsonOptions, cancellationToken);
         }
 
-        public static Task<TResult> SendJsonAsync<TResult, TInput> (this HttpClient client, string path, HttpMethod method, TInput data, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<TResult, TInput> (path, method, data, _defaultJsonOptions, cancellationToken);
-        }
-
-        public static Task<T> SendJsonAsync<T> (this HttpClient client, string path, HttpMethod method, T data, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T, T> (path, method, data, _defaultJsonOptions, cancellationToken);
-        }
-
-        public static Task<T> SendJsonAsync<T> (this HttpClient client, string path, HttpMethod method, T data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T, T> (path, method, data, jsonOptions, cancellationToken);
-        }
-
         public static async Task<TResult> SendJsonAsync<TResult, TInput> (this HttpClient client, string path, HttpMethod method, TInput data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
             using var request = new HttpRequestMessage (method, path);
             request.Headers.Clear ();
@@ -54,9 +42,9 @@ namespace Redpill.JsonClient {
                     request.Content = new StreamContent (ms);
                     request.Content.Headers.ContentType = new MediaTypeHeaderValue ("application/json");
                 } catch (JsonException e) {
-                    string message = "Could not serialize input object of type " + typeof(TResult).FullName + " to json";
+                    string message = "Could not serialize input object of type " + typeof (TResult).FullName + " to json";
                     throw new JsonClientException (message, 0, null, e);
-            }
+                }
             }
 
             using var response = await client.SendAsync (request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait (false);
@@ -66,29 +54,41 @@ namespace Redpill.JsonClient {
             return await response.DeserializeAsync<TResult> (jsonOptions, cancellationToken).ConfigureAwait (false);
         }
 
+        public static Task<TResult> SendJsonAsync<TResult, TInput> (this HttpClient client, string path, HttpMethod method, TInput data, CancellationToken cancellationToken = default) {
+            return client.SendJsonAsync<TResult, TInput> (path, method, data, _defaultJsonOptions, cancellationToken);
+        }
+
+        public static Task<T> SendJsonAsync<T> (this HttpClient client, string path, HttpMethod method, T data, CancellationToken cancellationToken = default) {
+            return client.SendJsonAsync<T, T> (path, method, data, _defaultJsonOptions, cancellationToken);
+        }
+
+        public static Task<T> SendJsonAsync<T> (this HttpClient client, string path, HttpMethod method, T data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
+            return client.SendJsonAsync<T, T> (path, method, data, jsonOptions, cancellationToken);
+        }
+
         public static Task<T> PostJsonAsync<T> (this HttpClient client, string path, T data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T, T> (path, HttpMethod.Post, data, jsonOptions, cancellationToken);
+            return client.PostJsonAsync<T, T> (path, data, jsonOptions, cancellationToken);
         }
         public static Task<TResult> PostJsonAsync<TResult, TInput> (this HttpClient client, string path, TInput data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
             return client.SendJsonAsync<TResult, TInput> (path, HttpMethod.Post, data, jsonOptions, cancellationToken);
         }
 
         public static Task<T> PostJsonAsync<T> (this HttpClient client, string path, T data, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T> (path, HttpMethod.Post, data, cancellationToken);
+            return client.PostJsonAsync<T, T> (path, data, cancellationToken);
         }
 
         public static Task<TResult> PostJsonAsync<TResult, TInput> (this HttpClient client, string path, TInput data, CancellationToken cancellationToken = default) {
             return client.SendJsonAsync<TResult, TInput> (path, HttpMethod.Post, data, cancellationToken);
         }
         public static Task<T> PutJsonAsync<T> (this HttpClient client, string path, T data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T, T> (path, HttpMethod.Delete, data, jsonOptions, cancellationToken);
+            return client.PutJsonAsync<T, T> (path, data, jsonOptions, cancellationToken);
         }
         public static Task<TResult> PutJsonAsync<TResult, TInput> (this HttpClient client, string path, TInput data, JsonSerializerOptions jsonOptions, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<TResult, TInput> (path, HttpMethod.Delete, data, jsonOptions, cancellationToken);
+            return client.SendJsonAsync<TResult, TInput> (path, HttpMethod.Put, data, jsonOptions, cancellationToken);
         }
 
         public static Task<T> PutJsonAsync<T> (this HttpClient client, string path, T data, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T, T> (path, HttpMethod.Delete, data, cancellationToken);
+            return client.PutJsonAsync<T, T> (path, data, cancellationToken);
         }
 
         public static Task<TResult> PutJsonAsync<TResult, TInput> (this HttpClient client, string path, TInput data, CancellationToken cancellationToken = default) {
@@ -103,7 +103,7 @@ namespace Redpill.JsonClient {
         }
 
         public static Task<T> DeleteJsonAsync<T> (this HttpClient client, string path, T data, CancellationToken cancellationToken = default) {
-            return client.SendJsonAsync<T, T> (path, HttpMethod.Delete, data, cancellationToken);
+            return client.DeleteJsonAsync<T, T> (path, data, cancellationToken);
         }
         public static Task<TResult> DeleteJsonAsync<TResult, TInput> (this HttpClient client, string path, TInput data, CancellationToken cancellationToken = default) {
             return client.SendJsonAsync<TResult, TInput> (path, HttpMethod.Delete, data, cancellationToken);
